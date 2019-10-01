@@ -26,12 +26,12 @@ RUN conda install -y \
 RUN conda install -y -c conda-forge \
         pyopengl \
         xgboost \
-        nbdime \
-        nodejs \
-        ipywidgets
+        nodejs
 
 COPY requirements.txt /tmp/
 RUN pip install --upgrade -r /tmp/requirements.txt
+
+RUN ipcluster nbextension enable
 
 ARG username
 ARG userid
@@ -72,9 +72,10 @@ RUN sudo rm /tmp/bashrc.bash
 
 # INFO: Uncomment lines below to enable automatic save of python-only and html-only
 #       exports alongside the notebook
-#COPY docker/jupyter_notebook_config.py /tmp/
-#RUN cat /tmp/jupyter_notebook_config.py >> ${home}/.jupyter/jupyter_notebook_config.py
-#RUN sudo rm /tmp/jupyter_notebook_config.py
+RUN mkdir -p ${home}/.jupyter
+COPY docker/jupyter_notebook_config.py /tmp/
+RUN cat /tmp/jupyter_notebook_config.py >> ${home}/.jupyter/jupyter_notebook_config.py
+RUN sudo rm /tmp/jupyter_notebook_config.py
 
 
 # INFO: Uncomment the RUN command below to disable git diff paging
@@ -89,6 +90,6 @@ RUN sudo rm /tmp/bashrc.bash
 #          from notebook.auth import passwd
 #          passwd()
 #       and take the hash from the output
-#RUN mkdir -p ${home}/.jupyter && \
-#    echo 'c.NotebookApp.password = u"sha1:c6bbcba2d04b:f969e403db876dcfbe26f47affe41909bd53392e"' \
-#    >> ${home}/.jupyter/jupyter_notebook_config.py
+RUN mkdir -p ${home}/.jupyter && \
+   echo 'c.NotebookApp.password = u"sha1:c6bbcba2d04b:f969e403db876dcfbe26f47affe41909bd53392e"' \
+   >> ${home}/.jupyter/jupyter_notebook_config.py
